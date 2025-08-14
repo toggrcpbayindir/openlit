@@ -57,6 +57,9 @@ model User {
   OpenGround       OpenGround[]
   createdApiKeys   APIKeys[]            @relation("createdByUser")
   deletedApiKeys   APIKeys[]            @relation("deletedByUser")
+  productivityTasks ProductivityTask[]
+  coinRecords      CoinRecord[]
+  dailySummaries   DailyProductivitySummary[]
 
   @@map("users")
 }
@@ -168,4 +171,57 @@ model EvaluationConfigs {
   auto             Boolean @default(false)
   recurringTime    String
   meta             String
+}
+
+// Productivity Tracking Models
+model ProductivityTask {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  priority    Int      @default(1) // 1-5 scale
+  difficulty  Int      @default(1) // 1-5 scale
+  status      String   @default("pending") // pending, in_progress, completed, cancelled
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  estimatedHours Float  @default(1)
+  actualHours    Float?
+  coinsEarned    Float  @default(0)
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  coinRecords    CoinRecord[]
+
+  @@map("productivity_tasks")
+}
+
+model CoinRecord {
+  id        String           @id @default(cuid())
+  taskId    String           @map("task_id")
+  task      ProductivityTask @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String           @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Float            // Coins earned
+  reason    String           // completion, bonus, penalty, etc.
+  timestamp DateTime         @default(now())
+  metadata  String?          // JSON metadata
+
+  @@map("coin_records")
+}
+
+model DailyProductivitySummary {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date         DateTime @unique
+  totalCoins   Float    @default(0)
+  tasksCompleted Int    @default(0)
+  totalHours   Float    @default(0)
+  avgPriority  Float    @default(0)
+  avgDifficulty Float   @default(0)
+  efficiency   Float    @default(0) // tasksCompleted / totalHours
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@map("daily_productivity_summary")
 }
