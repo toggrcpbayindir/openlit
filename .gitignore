@@ -12,3 +12,6 @@ logs/
 .env
 .vscode/
 .idea/
+
+# Coin calculator temporary files
+demo_output.txt
