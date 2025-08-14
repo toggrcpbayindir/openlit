@@ -19,7 +19,8 @@ import {
 	SettingsIcon,
 	ShieldAlert,
 	SquarePlay,
-	TextQuote
+	TextQuote,
+	Target
 } from "lucide-react";
 import VersionInfo from "./version-Info";
 
@@ -59,6 +60,11 @@ const SIDEBAR_ITEMS: SidebarItemProps[] = [
 		icon: <ShieldAlert className={ICON_CLASSES} />,
 		text: "Exceptions",
 		link: "/exceptions",
+	},
+	{
+		icon: <Target className={ICON_CLASSES} />,
+		text: "Productivity",
+		link: "/productivity",
 	},
 	{
 		icon: <Component className={ICON_CLASSES} />,
@@ -108,6 +114,8 @@ const getIfSidebarItemActive = (pathname: string, item: SidebarItemProps) => {
 			return pathname.startsWith("/requests");
 		case "/exceptions":
 			return pathname.startsWith("/exceptions");
+		case "/productivity":
+			return pathname.startsWith("/productivity");
 		case "/prompt-hub":
 			return pathname.startsWith("/prompt-hub");
 		case "/vault":
